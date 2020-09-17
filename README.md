@@ -2,7 +2,7 @@
 
 Tile layout manager in React.
 
-DEMO
+[DEMO](https://softremake.github.io/tiletabs/demo.html)
 
 Install:
 ```
