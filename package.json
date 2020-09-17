@@ -1,0 +1,67 @@
+{
+  "name": "tiletabs",
+  "version": "0.1.0",
+  "description": "Docking and tiling layout manager in React",
+  "author": "Softremake Technologies Inc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/softremake/tiletabs"
+  },
+  "bugs": {
+    "url": "https://github.com/softremake/tiletabs/issues"
+  },
+  "homepage": "https://github.com/softremake/tiletabs",
+  "main": "lib/tiletabs.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "clean": "rm -rf lib/",
+    "dev": "webpack-dev-server --config=webpack/dev.js",
+    "build": "webpack --config=webpack/lib.js"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^5.2.1",
+    "css-loader": "^4.2.2",
+    "html-webpack-plugin": "^4.4.1",
+    "prettier": "^1.18.2",
+    "react-hot-loader": "^4.12.21",
+    "rimraf": "^3.0.0",
+    "sass": "^1.26.10",
+    "sass-loader": "^10.0.1",
+    "source-map-loader": "^1.1.0",
+    "style-loader": "^1.2.1",
+    "tslint": "^5.20.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.6.3",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "@types/node": "^12.7.9",
+    "@types/react": "^16.9.4",
+    "@types/react-dom": "^16.9.1",
+    "react": "^16.10.1",
+    "react-dom": "^16.10.1"
+  },
+  "keywords": [
+    "react",
+    "layout",
+    "dock",
+    "tabs",
+    "drag-and-drop",
+    "tabset",
+    "splitter",
+    "drag",
+    "drop",
+    "reactjs",
+    "react-dom",
+    "ui",
+    "react",
+    "component",
+    "typescript",
+    "tiling-window-manager",
+    "window-manager"
+  ]
+}
