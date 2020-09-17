@@ -17,7 +17,8 @@
   "scripts": {
     "clean": "rm -rf lib/",
     "dev": "webpack-dev-server --config=webpack/dev.js",
-    "build": "webpack --config=webpack/lib.js"
+    "build": "webpack --config=webpack/lib.js",
+    "demo": "webpack --config=webpack/demo.js"
   },
   "devDependencies": {
     "awesome-typescript-loader": "^5.2.1",
