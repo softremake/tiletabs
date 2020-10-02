@@ -59,14 +59,7 @@ export class Box extends React.Component<IBoxProps> {
         if (pane && paneSize) {
 
             if (pane.props.maximized) {
-                style.width = '100%'
-                style.height = '100%'
-                style.position = 'absolute'
-                style.left = '0'
-                style.top = '0'
-                style.right = '0'
-                style.bottom = '0'
-                style.zIndex = '99'
+                // see pane-maximized css class
             } else {
                 style.position = 'initial'
                 if (this.props.direction === Direction.vertical) {

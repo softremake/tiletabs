@@ -15,7 +15,7 @@ export class Pane extends React.Component<IPaneProps> {
 
     public render() {
         return (
-            <div className={"pane"} style={this.props.style} data-id={this.props.id}>
+            <div className={"pane" + (this.props.props.maximized ? " pane-maximized" : "")} style={this.props.style} data-id={this.props.id}>
                 <Header
                     title={this.props.title}
                     maximized={this.props.props.maximized}
