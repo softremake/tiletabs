@@ -55,6 +55,11 @@ export declare class TileTabs extends React.Component<ITileTabsProps, ITileTabsS
     protected cloneItem: (source: ItemConfig) => any;
     protected buildIds(item: ItemConfig, parent?: ItemConfig, isPane2?: boolean): void;
     protected handleResize: () => void;
+    protected getRealOffset(el: any): {
+        y: number;
+        x: number;
+    };
+    protected findUnderlyingPane: (node: any, x: any, y: any) => any;
     protected handleMouseMove: (e: any) => void;
     protected handleTouchMove: (e: any) => void;
     protected handleSplitterMouseDown: (e: any) => void;
