@@ -79,7 +79,6 @@ export class Header extends React.Component<IHeaderProps, any> {
 
     protected onMouseDown = (e) => {
         if (e.button === 0) {
-            // console.log('header mouse down')
             e.preventDefault()
 
             // if not max

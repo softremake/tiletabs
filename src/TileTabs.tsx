@@ -411,34 +411,25 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
             this.clientX = e.pageX
             this.clientY = e.pageY
 
-
             // throttling
             setTimeout(() => {
-                // console.log(e.pageX, e.pageY, e.clientX, e.clientY)
                 if (this.state.splitting) {
                     const newState: any = this.cloneState()
                     const newSplitParent = this.findItemById(newState, this.splitParent.id)
 
                     const containerRect = this.splitEl.getBoundingClientRect()
-                    // console.log({ containerRect })
 
                     const realOffset = this.getRealOffset(this.splitEl)
-                    // console.log({ realOffset })
 
                     if (this.splitParent.props.direction === 'vertical') {
-                        // const top = this.clientY - this.splitEl.offsetTop - this.ref.offsetTop
                         const top = this.clientY - realOffset.y
-                        // console.log('top', top, this.clientY, this.splitEl.offsetTop, this.ref.offsetTop)
-                        // console.log('top', top, this.clientY, realOffset.y)
 
                         if (top > DEFAULTS.minH && top < containerRect.height - DEFAULTS.minH) {
                             newSplitParent.props.size = Math.floor((top / containerRect.height) * 100)
                         }
                     } else {
-                        // const left = this.clientX - this.splitEl.offsetLeft - this.ref.offsetLeft // - containerRect.x
                         const left = this.clientX - realOffset.x
-                        // console.log('left', left, this.clientX, this.splitEl.offsetLeft, this.ref.offsetLeft)
-                        // console.log('left', left, this.clientX, realOffset.x)
+
                         if (left > DEFAULTS.minW && left < containerRect.width - DEFAULTS.minW) {
                             newSplitParent.props.size = Math.floor((left / containerRect.width) * 100)
                         }
@@ -476,12 +467,9 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
                             this.setState({ ...this.state, dockId: 0, dock, dockArea })
                         } else {
                             const realOffset = this.getRealOffset(target)
-                            // console.log({ realOffset })
 
                             const left = this.clientX - realOffset.x
                             const top = this.clientY - realOffset.y
-
-                            // console.log({left, top})
 
                             if (top <= halfH) {
                                 dockArea = 'top'
@@ -553,7 +541,6 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
                     const style = getComputedStyle(e.target)
                     this.prevCursor = style.cursor
                     this.currentSplitter = e.target
-                    console.log(this.currentSplitter)
                     e.target.style.cursor = 'grabbing'
                     document.body.style.cursor = 'grabbing'
 
@@ -576,10 +563,7 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
             if (this.state.splitting) {
                 e.preventDefault()
 
-                console.log(this.prevCursor)
-
                 this.currentSplitter.style.cursor = this.prevCursor
-                console.log(this.currentSplitter)
                 document.body.style.cursor = 'auto'
 
                 this.setState({ ...this.state, splitting: false }, this.callOnChange)
