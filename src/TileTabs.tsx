@@ -42,6 +42,7 @@ interface ITileTabsState {
 export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
     protected maxId: number = 0
     protected ref
+    protected refRect: IRect
 
     protected prevCursor = ''
     protected currentSplitter = null
@@ -292,6 +293,15 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
 
     public componentDidMount() {
         if (typeof window !== 'undefined') {
+            const rect = this.ref.getBoundingClientRect()
+            const refOffset = this.getRealOffset(this.ref)
+            this.refRect = {
+                left:  refOffset.x,
+                top:  refOffset.y,
+                width: rect.width,
+                height: rect.height
+            }
+
             window.addEventListener('resize', this.handleResize)
             document.addEventListener('mouseup', this.handleMouseUp)
             document.addEventListener('mousedown', this.handleSplitterMouseDown)
@@ -361,19 +371,19 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
         // todo: onResizeEvent
     }
 
-    protected getRealOffset( el ) {
+    protected getRealOffset(el) {
         let x = 0
         let y = 0
-        while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
-            x += el.offsetLeft - el.scrollLeft;
-            y += el.offsetTop - el.scrollTop;
-            el = el.offsetParent;
+        while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+            x += el.offsetLeft - el.scrollLeft
+            y += el.offsetTop - el.scrollTop
+            el = el.offsetParent
         }
         return { y, x }
     }
 
     protected findUnderlyingPane = (node, x, y) => {
-        if(node) {
+        if (node) {
             if (node.classList && node.classList.contains('pane')) {
                 return node
             } else if (node.parentNode) {
@@ -384,7 +394,7 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
         // if we have an element with abs coordinates
         const elements = document.elementsFromPoint(x, y)
 
-        for(const el of elements) {
+        for (const el of elements) {
             if (el.classList && el.classList.contains('pane')) {
                 return el
             }
@@ -394,129 +404,135 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
     }
 
     protected handleMouseMove = (e) => {
-        this.clientX = e.pageX
-        this.clientY = e.pageY
+        if (
+            (e.pageX >= this.refRect.left && e.pageX <= this.refRect.left + this.refRect.width)
+            && (e.pageY >= this.refRect.top && e.pageY <= this.refRect.top + this.refRect.height)
+        ) {
+            this.clientX = e.pageX
+            this.clientY = e.pageY
 
 
-        // throttling
-        setTimeout(() => {
-            // console.log(e.pageX, e.pageY, e.clientX, e.clientY)
-            if (this.state.splitting) {
-                const newState: any = this.cloneState()
-                const newSplitParent = this.findItemById(newState, this.splitParent.id)
+            // throttling
+            setTimeout(() => {
+                // console.log(e.pageX, e.pageY, e.clientX, e.clientY)
+                if (this.state.splitting) {
+                    const newState: any = this.cloneState()
+                    const newSplitParent = this.findItemById(newState, this.splitParent.id)
 
-                const containerRect = this.splitEl.getBoundingClientRect()
-                // console.log({ containerRect })
+                    const containerRect = this.splitEl.getBoundingClientRect()
+                    // console.log({ containerRect })
 
-                const realOffset = this.getRealOffset(this.splitEl)
-                // console.log({ realOffset })
+                    const realOffset = this.getRealOffset(this.splitEl)
+                    // console.log({ realOffset })
 
-                if (this.splitParent.props.direction === 'vertical') {
-                    // const top = this.clientY - this.splitEl.offsetTop - this.ref.offsetTop
-                    const top = this.clientY - realOffset.y
-                    // console.log('top', top, this.clientY, this.splitEl.offsetTop, this.ref.offsetTop)
-                    // console.log('top', top, this.clientY, realOffset.y)
-
-                    if (top > DEFAULTS.minH && top < containerRect.height - DEFAULTS.minH) {
-                        newSplitParent.props.size = Math.floor((top / containerRect.height) * 100)
-                    }
-                } else {
-                    // const left = this.clientX - this.splitEl.offsetLeft - this.ref.offsetLeft // - containerRect.x
-                    const left = this.clientX - realOffset.x
-                    // console.log('left', left, this.clientX, this.splitEl.offsetLeft, this.ref.offsetLeft)
-                    // console.log('left', left, this.clientX, realOffset.x)
-                    if (left > DEFAULTS.minW && left < containerRect.width - DEFAULTS.minW) {
-                        newSplitParent.props.size = Math.floor((left / containerRect.width) * 100)
-                    }
-                }
-
-                this.setState(newState)
-            } else if (this.state.dragging) {
-
-                // find underlying pane
-                const target = this.findUnderlyingPane(e.target, this.clientX, this.clientY)
-
-                if (target && target.parentNode && target.classList.contains('pane')) {
-                    // get id
-                    const dockId = parseInt(target.getAttribute('data-id'), 10)
-
-                    if (dockId === this.state.dragId) {
-                        return
-                    }
-
-                    // quadrant
-                    let dockArea = ''
-
-                    const containerRect = target.getBoundingClientRect()
-                    const halfW = Math.floor(containerRect.width / 2)
-                    const halfH = Math.floor(containerRect.height / 2)
-
-                    const dock = {
-                        left: 0,
-                        top: 0,
-                        width: 0,
-                        height: 0,
-                    }
-
-                    if (containerRect.height <= DEFAULTS.minH && containerRect.width <= DEFAULTS.minW) {
-                        this.setState({ ...this.state, dockId: 0, dock, dockArea })
-                    } else {
-                        const realOffset = this.getRealOffset(target)
-                        // console.log({ realOffset })
-
-                        const left = this.clientX - realOffset.x
+                    if (this.splitParent.props.direction === 'vertical') {
+                        // const top = this.clientY - this.splitEl.offsetTop - this.ref.offsetTop
                         const top = this.clientY - realOffset.y
+                        // console.log('top', top, this.clientY, this.splitEl.offsetTop, this.ref.offsetTop)
+                        // console.log('top', top, this.clientY, realOffset.y)
 
-                        // console.log({left, top})
+                        if (top > DEFAULTS.minH && top < containerRect.height - DEFAULTS.minH) {
+                            newSplitParent.props.size = Math.floor((top / containerRect.height) * 100)
+                        }
+                    } else {
+                        // const left = this.clientX - this.splitEl.offsetLeft - this.ref.offsetLeft // - containerRect.x
+                        const left = this.clientX - realOffset.x
+                        // console.log('left', left, this.clientX, this.splitEl.offsetLeft, this.ref.offsetLeft)
+                        // console.log('left', left, this.clientX, realOffset.x)
+                        if (left > DEFAULTS.minW && left < containerRect.width - DEFAULTS.minW) {
+                            newSplitParent.props.size = Math.floor((left / containerRect.width) * 100)
+                        }
+                    }
 
-                        if (top <= halfH) {
-                            dockArea = 'top'
+                    this.setState(newState)
+                } else if (this.state.dragging) {
 
-                            dock.left = target.offsetLeft
-                            dock.top = target.offsetTop + DEFAULTS.headerH
-                            dock.width = containerRect.width
-                            dock.height = halfH - DEFAULTS.headerH
+                    // find underlying pane
+                    const target = this.findUnderlyingPane(e.target, this.clientX, this.clientY)
 
-                            const minBottom = Math.floor(containerRect.height * 0.3)
-                            if (left <= halfW && top > minBottom) {
-                                dockArea = 'left'
-                                dock.width = halfW
-                                dock.height = containerRect.height - DEFAULTS.headerH
-                            } else if (left > halfW && top > minBottom) {
-                                dockArea = 'right'
-                                dock.left = target.offsetLeft + containerRect.width - halfW
-                                dock.width = halfW
-                                dock.height = containerRect.height - DEFAULTS.headerH
-                            }
-                        } else if (top > halfH) {
-                            dockArea = 'bottom'
+                    if (target && target.parentNode && target.classList.contains('pane')) {
+                        // get id
+                        const dockId = parseInt(target.getAttribute('data-id'), 10)
 
-                            dock.left = target.offsetLeft
-                            dock.top = target.offsetTop + DEFAULTS.headerH + halfH
-                            dock.width = containerRect.width
-                            dock.height = halfH - DEFAULTS.headerH
-
-                            const minBottom = containerRect.height - Math.floor(containerRect.height * 0.3)
-                            if (left <= halfW && top < minBottom) {
-                                dockArea = 'left'
-                                dock.top = target.offsetTop + DEFAULTS.headerH
-                                dock.width = halfW
-                                dock.height = containerRect.height - DEFAULTS.headerH
-                            } else if (left > halfW && top < minBottom) {
-                                dockArea = 'right'
-                                dock.left = target.offsetLeft + containerRect.width - halfW
-                                dock.top = target.offsetTop + DEFAULTS.headerH
-                                dock.width = halfW
-                                dock.height = containerRect.height - DEFAULTS.headerH
-                            }
+                        if (dockId === this.state.dragId) {
+                            return
                         }
 
-                        // show it
-                        this.setState({ ...this.state, dockId, dock, dockArea })
+                        // quadrant
+                        let dockArea = ''
+
+                        const containerRect = target.getBoundingClientRect()
+                        const halfW = Math.floor(containerRect.width / 2)
+                        const halfH = Math.floor(containerRect.height / 2)
+
+                        const dock = {
+                            left: 0,
+                            top: 0,
+                            width: 0,
+                            height: 0,
+                        }
+
+                        if (containerRect.height <= DEFAULTS.minH && containerRect.width <= DEFAULTS.minW) {
+                            this.setState({ ...this.state, dockId: 0, dock, dockArea })
+                        } else {
+                            const realOffset = this.getRealOffset(target)
+                            // console.log({ realOffset })
+
+                            const left = this.clientX - realOffset.x
+                            const top = this.clientY - realOffset.y
+
+                            // console.log({left, top})
+
+                            if (top <= halfH) {
+                                dockArea = 'top'
+
+                                dock.left = target.offsetLeft
+                                dock.top = target.offsetTop + DEFAULTS.headerH
+                                dock.width = containerRect.width
+                                dock.height = halfH - DEFAULTS.headerH
+
+                                const minBottom = Math.floor(containerRect.height * 0.3)
+                                if (left <= halfW && top > minBottom) {
+                                    dockArea = 'left'
+                                    dock.width = halfW
+                                    dock.height = containerRect.height - DEFAULTS.headerH
+                                } else if (left > halfW && top > minBottom) {
+                                    dockArea = 'right'
+                                    dock.left = target.offsetLeft + containerRect.width - halfW
+                                    dock.width = halfW
+                                    dock.height = containerRect.height - DEFAULTS.headerH
+                                }
+                            } else if (top > halfH) {
+                                dockArea = 'bottom'
+
+                                dock.left = target.offsetLeft
+                                dock.top = target.offsetTop + DEFAULTS.headerH + halfH
+                                dock.width = containerRect.width
+                                dock.height = halfH - DEFAULTS.headerH
+
+                                const minBottom = containerRect.height - Math.floor(containerRect.height * 0.3)
+                                if (left <= halfW && top < minBottom) {
+                                    dockArea = 'left'
+                                    dock.top = target.offsetTop + DEFAULTS.headerH
+                                    dock.width = halfW
+                                    dock.height = containerRect.height - DEFAULTS.headerH
+                                } else if (left > halfW && top < minBottom) {
+                                    dockArea = 'right'
+                                    dock.left = target.offsetLeft + containerRect.width - halfW
+                                    dock.top = target.offsetTop + DEFAULTS.headerH
+                                    dock.width = halfW
+                                    dock.height = containerRect.height - DEFAULTS.headerH
+                                }
+                            }
+
+                            // show it
+                            this.setState({ ...this.state, dockId, dock, dockArea })
+                        }
                     }
                 }
-            }
-        }, 50)
+            }, 50)
+
+        }
     }
 
     protected handleTouchMove = (e) => {
@@ -524,22 +540,27 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
     }
 
     protected handleSplitterMouseDown = (e) => {
-        if (e.button === 0) {
-            if (e.target.classList.contains('splitter')) {
-                e.preventDefault()
+        if (
+            (e.pageX >= this.refRect.left && e.pageX <= this.refRect.left + this.refRect.width)
+            && (e.pageY >= this.refRect.top && e.pageY <= this.refRect.top + this.refRect.height)
+        ) {
+            if (e.button === 0) {
+                if (e.target.classList.contains('splitter')) {
+                    e.preventDefault()
 
-                this.splitParent = this.findItemById(this.state, parseInt(e.target.getAttribute('data-pane1'), 10)).parent
-                this.splitEl = e.target.parentNode
-                const style = getComputedStyle(e.target)
-                this.prevCursor = style.cursor
-                this.currentSplitter = e.target
+                    this.splitParent = this.findItemById(this.state, parseInt(e.target.getAttribute('data-pane1'), 10)).parent
+                    this.splitEl = e.target.parentNode
+                    const style = getComputedStyle(e.target)
+                    this.prevCursor = style.cursor
+                    this.currentSplitter = e.target
+                    console.log(this.currentSplitter)
+                    e.target.style.cursor = 'grabbing'
+                    document.body.style.cursor = 'grabbing'
 
-                e.target.style.cursor = 'grabbing'
-                document.body.style.cursor = 'grabbing'
+                    this.setState({ ...this.state, splitting: true })
+                }
 
-                this.setState({ ...this.state, splitting: true })
             }
-
         }
     }
 
@@ -555,7 +576,10 @@ export class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
             if (this.state.splitting) {
                 e.preventDefault()
 
+                console.log(this.prevCursor)
+
                 this.currentSplitter.style.cursor = this.prevCursor
+                console.log(this.currentSplitter)
                 document.body.style.cursor = 'auto'
 
                 this.setState({ ...this.state, splitting: false }, this.callOnChange)
