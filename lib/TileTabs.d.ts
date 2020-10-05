@@ -27,6 +27,7 @@ interface ITileTabsState {
 export declare class TileTabs extends React.Component<ITileTabsProps, ITileTabsState> {
     protected maxId: number;
     protected ref: any;
+    protected refRect: IRect;
     protected prevCursor: string;
     protected currentSplitter: any;
     protected splitParent: ItemConfig;
